@@ -1,0 +1,103 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Resolve release variables
+        id: vars
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          ASSET="GuruAudioEnhancer-${VERSION}-jf12.zip"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "asset=${ASSET}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore
+        run: dotnet restore Jellyfin.Plugin.GuruAudioEnhancer/Jellyfin.Plugin.GuruAudioEnhancer.csproj
+
+      - name: Publish
+        run: >-
+          dotnet publish Jellyfin.Plugin.GuruAudioEnhancer/Jellyfin.Plugin.GuruAudioEnhancer.csproj
+          --configuration Release
+          --no-restore
+          --output publish
+          -p:Version=${{ steps.vars.outputs.version }}
+          -p:AssemblyVersion=${{ steps.vars.outputs.version }}
+          -p:FileVersion=${{ steps.vars.outputs.version }}
+
+      - name: Generate plugin metadata
+        run: |
+          mkdir -p package
+          cp publish/Jellyfin.Plugin.GuruAudioEnhancer.dll package/
+          cp docs/images/logo.png package/logo.png
+          python3 .github/scripts/create_meta.py \
+            --version "${{ steps.vars.outputs.version }}" \
+            --target-abi "12.0.0.0" \
+            --repository "${GITHUB_REPOSITORY}" \
+            --owner "${GITHUB_REPOSITORY_OWNER}" \
+            --output package/meta.json
+
+      - name: Package release
+        shell: bash
+        run: |
+          cd package
+          zip -9j "../${{ steps.vars.outputs.asset }}" Jellyfin.Plugin.GuruAudioEnhancer.dll meta.json logo.png
+          cd ..
+          md5sum "${{ steps.vars.outputs.asset }}" | awk '{print $1}' > release.md5
+          echo "MD5: $(cat release.md5)"
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "${{ steps.vars.outputs.asset }}" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "${{ steps.vars.outputs.asset }}" \
+              --title "Guru Audio Enhancer ${{ steps.vars.outputs.version }}" \
+              --generate-notes
+          fi
+
+      - name: Update Jellyfin repository manifest on main
+        shell: bash
+        run: |
+          CHECKSUM="$(cat release.md5)"
+          git fetch origin main
+          git checkout -B main origin/main
+          python3 .github/scripts/update_manifest.py \
+            --manifest manifest.json \
+            --version "${{ steps.vars.outputs.version }}" \
+            --tag "$GITHUB_REF_NAME" \
+            --checksum "$CHECKSUM" \
+            --repository "$GITHUB_REPOSITORY" \
+            --asset "${{ steps.vars.outputs.asset }}" \
+            --target-abi "12.0.0.0"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          if git diff --cached --quiet; then
+            echo "Manifest already current."
+          else
+            git commit -m "chore: publish ${{ steps.vars.outputs.version }}"
+            git push origin main
+          fi
