@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Guru Audio Enhancer logo">
+  <circle cx="256" cy="256" r="238" fill="#161b22"/>
+  <circle cx="256" cy="256" r="214" fill="none" stroke="#3f4956" stroke-width="5"/>
+  <rect x="105" y="112" width="302" height="242" rx="58" fill="#212a34" stroke="#54d7c8" stroke-width="12"/>
+  <path d="M180 346 L144 412 L232 354" fill="#212a34" stroke="#54d7c8" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M174 348 H238" stroke="#212a34" stroke-width="18"/>
+  <g fill="#ffb74d">
+    <rect x="156" y="202" width="24" height="66" rx="12"/>
+    <rect x="206" y="172" width="24" height="126" rx="12"/>
+    <rect x="256" y="147" width="24" height="176" rx="12"/>
+    <rect x="306" y="172" width="24" height="126" rx="12"/>
+    <rect x="356" y="202" width="24" height="66" rx="12"/>
+  </g>
+  <circle cx="268" cy="235" r="21" fill="#f5f7fa"/>
+</svg>

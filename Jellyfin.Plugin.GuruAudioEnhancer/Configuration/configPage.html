@@ -1,0 +1,313 @@
+<div id="GuruAudioEnhancerConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-checkbox">
+  <div data-role="content">
+    <div class="content-primary">
+      <form id="GuruAudioEnhancerConfigForm">
+        <h2>Guru Audio Enhancer <span style="opacity:.55;font-size:.65em">v0.1.2</span></h2>
+        <p>Creates external AAC tracks that Jellyfin clients can select from the normal Audio menu. Video and original audio are never modified.</p>
+
+        <div class="inputContainer">
+          <label class="inputLabel inputLabelUnfocused" for="FfmpegPath">FFmpeg path</label>
+          <input id="FfmpegPath" is="emby-input" type="text" />
+          <div class="fieldDescription">Typical Jellyfin Ubuntu path: /usr/lib/jellyfin-ffmpeg/ffmpeg</div>
+        </div>
+
+        <label class="emby-checkbox-label"><input id="ProcessMovies" type="checkbox" is="emby-checkbox" /><span>Process movies</span></label>
+        <label class="emby-checkbox-label"><input id="ProcessEpisodes" type="checkbox" is="emby-checkbox" /><span>Process TV episodes</span></label>
+
+        <div style="margin:1.5em 0;padding:1em;border:1px solid rgba(255,193,7,.55);border-radius:6px;background:rgba(255,193,7,.06)">
+          <h3 style="margin-top:0">Safe Test Mode</h3>
+          <label class="emby-checkbox-label"><input id="TestMode" type="checkbox" is="emby-checkbox" /><span><b>Test mode — process only ONE selected Jellyfin title</b></span></label>
+          <div class="fieldDescription" style="margin:.5em 0 1em">Recommended while testing. v0.1.2 stores the exact Jellyfin item ID, so similarly named movies or episodes cannot be selected accidentally.</div>
+
+          <div class="inputContainer">
+            <label class="inputLabel inputLabelUnfocused" for="LibrarySearch">Find movie / episode</label>
+            <div style="display:flex;gap:.6em;align-items:stretch">
+              <input id="LibrarySearch" is="emby-input" type="text" placeholder="e.g. Pressure" style="flex:1" />
+              <button id="SearchLibrary" is="emby-button" type="button" class="raised emby-button"><span>Search</span></button>
+            </div>
+            <div class="fieldDescription">Searches your Jellyfin library using the Movies / TV Episodes choices above.</div>
+          </div>
+
+          <div id="SearchResultsWrap" class="inputContainer" style="display:none">
+            <label class="inputLabel inputLabelUnfocused" for="SearchResults">Search results</label>
+            <select id="SearchResults" style="width:100%;min-height:2.7em;padding:.5em;background:rgba(0,0,0,.22);color:inherit;border:1px solid rgba(255,255,255,.25);border-radius:3px"></select>
+            <div style="margin-top:.7em"><button id="UseSelectedItem" is="emby-button" type="button" class="raised emby-button"><span>Use selected title</span></button></div>
+          </div>
+
+          <div id="SearchMessage" class="fieldDescription" style="margin-top:.7em"></div>
+
+          <div id="SelectedItemCard" style="display:none;margin-top:1em;padding:1em;border:1px solid rgba(255,255,255,.16);border-radius:6px;background:rgba(255,255,255,.035)">
+            <div style="font-size:.8em;opacity:.65;text-transform:uppercase;letter-spacing:.08em">Selected test title</div>
+            <div id="SelectedItemName" style="font-size:1.2em;font-weight:600;margin:.2em 0"></div>
+            <div id="SelectedItemMeta" style="opacity:.8"></div>
+            <div id="SelectedItemPath" style="opacity:.58;font-size:.9em;word-break:break-all;margin-top:.4em"></div>
+            <input id="TestItemId" type="hidden" />
+            <input id="TestItemName" type="hidden" />
+
+            <div style="margin-top:1em;padding-top:1em;border-top:1px solid rgba(255,255,255,.12)">
+              <div style="display:flex;gap:.6em;align-items:center;flex-wrap:wrap">
+                <b>Enhanced track status</b>
+                <button id="RefreshTrackStatus" is="emby-button" type="button" class="emby-button"><span>Refresh</span></button>
+              </div>
+              <div id="TrackStatus" style="display:flex;gap:.5em;flex-wrap:wrap;margin-top:.7em"></div>
+              <div id="SourceAudioInfo" class="fieldDescription" style="margin-top:.7em"></div>
+              <div class="fieldDescription" style="margin-top:.4em">Status reflects tracks Jellyfin has discovered. After generating new files, refresh/scan the title before refreshing this status.</div>
+            </div>
+          </div>
+        </div>
+
+        <h3>Presets</h3>
+        <label class="emby-checkbox-label"><input id="DialogueBoostEnabled" type="checkbox" is="emby-checkbox" /><span>Dialogue Boost — clearer voices, moderate dynamics</span></label>
+        <label class="emby-checkbox-label"><input id="NightModeEnabled" type="checkbox" is="emby-checkbox" /><span>Night Mode — stronger compression of loud music/effects</span></label>
+        <label class="emby-checkbox-label"><input id="StrongDialogueEnabled" type="checkbox" is="emby-checkbox" /><span>Strong Dialogue — aggressive speech-forward mix</span></label>
+        <div class="fieldDescription" style="margin:.5em 0 1em">Dialogue Boost and Night Mode use the same tuned filter profiles proven in v0.1.1.</div>
+
+        <div class="inputContainer">
+          <label class="inputLabel inputLabelUnfocused" for="AacBitrateKbps">AAC bitrate (kbps)</label>
+          <input id="AacBitrateKbps" is="emby-input" type="number" min="96" max="320" step="16" />
+        </div>
+
+        <label class="emby-checkbox-label"><input id="OverwriteExisting" type="checkbox" is="emby-checkbox" /><span>Overwrite existing generated tracks</span></label>
+        <label class="emby-checkbox-label"><input id="SkipNonLocalMedia" type="checkbox" is="emby-checkbox" /><span>Skip non-local/URL media</span></label>
+
+        <div style="margin-top:2em;padding:1em;border:1px solid rgba(255,255,255,.15);border-radius:6px">
+          <b>How to run</b><br />Save settings, then open Dashboard → Scheduled Tasks → Guru Audio Enhancer → <b>Generate enhanced dialogue audio</b>.
+          After it completes, refresh/scan the selected title so Jellyfin discovers the new external audio tracks.
+        </div>
+
+        <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span>Save</span></button>
+      </form>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    (function () {
+      const pluginId = '61a21ab4-b0c7-4e18-92d1-42f8495ed131';
+      const page = document.querySelector('#GuruAudioEnhancerConfigPage');
+      let searchItems = [];
+      let currentSelectedItem = null;
+
+      function el(id) { return page.querySelector('#' + id); }
+      function setChecked(id, value) { el(id).checked = !!value; }
+      function htmlEscape(value) {
+        return String(value == null ? '' : value)
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+      }
+      function apiGet(path, params) {
+        return ApiClient.ajax({
+          type: 'GET',
+          url: ApiClient.getUrl(path, params || {}),
+          dataType: 'json'
+        });
+      }
+      function selectedTypes() {
+        const types = [];
+        if (el('ProcessMovies').checked) types.push('Movie');
+        if (el('ProcessEpisodes').checked) types.push('Episode');
+        return types.length ? types.join(',') : 'Movie,Episode';
+      }
+      function formatItem(item) {
+        const bits = [item.Type || 'Item'];
+        if (item.ProductionYear) bits.push(item.ProductionYear);
+        if (item.SeriesName) bits.push(item.SeriesName);
+        return item.Name + ' — ' + bits.join(' · ');
+      }
+      function showSelectedItem(item) {
+        if (!item || !item.Id) {
+          currentSelectedItem = null;
+          el('SelectedItemCard').style.display = 'none';
+          return;
+        }
+        currentSelectedItem = item;
+        el('TestItemId').value = item.Id;
+        el('TestItemName').value = item.Name || '';
+        el('SelectedItemName').textContent = item.Name || 'Selected item';
+        const meta = [];
+        if (item.Type) meta.push(item.Type);
+        if (item.ProductionYear) meta.push(item.ProductionYear);
+        if (item.SeriesName) meta.push(item.SeriesName);
+        el('SelectedItemMeta').textContent = meta.join(' · ');
+        el('SelectedItemPath').textContent = item.Path || '';
+        el('SelectedItemCard').style.display = '';
+        refreshStatus();
+      }
+      function badge(label, found) {
+        const bg = found ? 'rgba(76,175,80,.18)' : 'rgba(255,255,255,.06)';
+        const border = found ? 'rgba(76,175,80,.55)' : 'rgba(255,255,255,.16)';
+        const mark = found ? '✓ ' : '— ';
+        return '<span style="padding:.45em .65em;border:1px solid ' + border + ';background:' + bg + ';border-radius:999px">' + mark + htmlEscape(label) + '</span>';
+      }
+      function allAudioStreams(item) {
+        let streams = [];
+        if (Array.isArray(item.MediaStreams)) streams = streams.concat(item.MediaStreams);
+        (item.MediaSources || []).forEach(function (source) {
+          if (Array.isArray(source.MediaStreams)) streams = streams.concat(source.MediaStreams);
+        });
+        const seen = {};
+        return streams.filter(function (s) {
+          const key = [s.Index, s.Type, s.Title, s.DisplayTitle, s.Path, s.IsExternal].join('|');
+          if (seen[key]) return false;
+          seen[key] = true;
+          return String(s.Type || '').toLowerCase() === 'audio';
+        });
+      }
+      function streamContains(stream, name) {
+        const text = [stream.Title, stream.DisplayTitle, stream.Path, stream.Language].filter(Boolean).join(' ').toLowerCase();
+        return !!stream.IsExternal && text.indexOf(name.toLowerCase()) !== -1;
+      }
+      function refreshStatus() {
+        const id = el('TestItemId').value;
+        if (!id) return;
+        el('TrackStatus').innerHTML = '<span style="opacity:.65">Checking…</span>';
+        apiGet('Items', {
+          UserId: ApiClient.getCurrentUserId(),
+          Ids: id,
+          Recursive: true,
+          Fields: 'Path,MediaSources',
+          EnableTotalRecordCount: false,
+          Limit: 1
+        }).then(function (result) {
+          const item = result && result.Items && result.Items[0];
+          if (!item) {
+            el('TrackStatus').innerHTML = '<span style="opacity:.65">Selected item was not returned by Jellyfin.</span>';
+            return;
+          }
+          currentSelectedItem = Object.assign({}, currentSelectedItem || {}, item);
+          if (item.Path) el('SelectedItemPath').textContent = item.Path;
+          const streams = allAudioStreams(item);
+          const hasDialogue = streams.some(function (s) { return streamContains(s, 'Dialogue Boost'); });
+          const hasNight = streams.some(function (s) { return streamContains(s, 'Night Mode'); });
+          const hasStrong = streams.some(function (s) { return streamContains(s, 'Strong Dialogue'); });
+          el('TrackStatus').innerHTML = badge('Dialogue Boost', hasDialogue) + badge('Night Mode', hasNight) + badge('Strong Dialogue', hasStrong);
+
+          const originals = streams.filter(function (s) { return !s.IsExternal; });
+          if (originals.length) {
+            const s = originals[0];
+            const parts = [];
+            if (s.DisplayTitle) parts.push(s.DisplayTitle);
+            else if (s.Codec) parts.push(String(s.Codec).toUpperCase());
+            if (s.Channels) parts.push(s.Channels + ' channels');
+            if (s.Language) parts.push(s.Language);
+            el('SourceAudioInfo').textContent = 'Source audio (v0.1.2 processes first audio stream): ' + parts.join(' · ');
+          } else {
+            el('SourceAudioInfo').textContent = 'Source audio details are not currently available from Jellyfin.';
+          }
+        }).catch(function (err) {
+          el('TrackStatus').innerHTML = '<span style="opacity:.65">Could not read track status.</span>';
+          console.error('Guru Audio Enhancer status error', err);
+        });
+      }
+      function runSearch() {
+        const term = (el('LibrarySearch').value || '').trim();
+        if (term.length < 2) {
+          el('SearchMessage').textContent = 'Enter at least 2 characters.';
+          return;
+        }
+        el('SearchMessage').textContent = 'Searching…';
+        el('SearchResultsWrap').style.display = 'none';
+        apiGet('Items', {
+          UserId: ApiClient.getCurrentUserId(),
+          Recursive: true,
+          SearchTerm: term,
+          IncludeItemTypes: selectedTypes(),
+          Limit: 30,
+          Fields: 'Path,MediaSources',
+          EnableTotalRecordCount: false,
+          SortBy: 'SortName'
+        }).then(function (result) {
+          searchItems = (result && result.Items) || [];
+          const select = el('SearchResults');
+          select.innerHTML = '';
+          searchItems.forEach(function (item, index) {
+            const opt = document.createElement('option');
+            opt.value = String(index);
+            opt.textContent = formatItem(item);
+            select.appendChild(opt);
+          });
+          if (!searchItems.length) {
+            el('SearchMessage').textContent = 'No matching movies or episodes found.';
+            return;
+          }
+          el('SearchMessage').textContent = searchItems.length + ' match' + (searchItems.length === 1 ? '' : 'es') + ' found.';
+          el('SearchResultsWrap').style.display = '';
+        }).catch(function (err) {
+          el('SearchMessage').textContent = 'Search failed. Check the Jellyfin log/browser console.';
+          console.error('Guru Audio Enhancer search error', err);
+        });
+      }
+
+      page.addEventListener('pageshow', function () {
+        Dashboard.showLoadingMsg();
+        ApiClient.getPluginConfiguration(pluginId).then(function (c) {
+          el('FfmpegPath').value = c.FfmpegPath || '/usr/lib/jellyfin-ffmpeg/ffmpeg';
+          setChecked('TestMode', c.TestMode !== false);
+          setChecked('ProcessMovies', c.ProcessMovies);
+          setChecked('ProcessEpisodes', c.ProcessEpisodes);
+          setChecked('DialogueBoostEnabled', c.DialogueBoostEnabled);
+          setChecked('NightModeEnabled', c.NightModeEnabled);
+          setChecked('StrongDialogueEnabled', c.StrongDialogueEnabled);
+          el('AacBitrateKbps').value = c.AacBitrateKbps || 192;
+          setChecked('OverwriteExisting', c.OverwriteExisting);
+          setChecked('SkipNonLocalMedia', c.SkipNonLocalMedia);
+          el('TestItemId').value = c.TestItemId || '';
+          el('TestItemName').value = c.TestItemName || '';
+
+          if (c.TestItemId) {
+            apiGet('Items', {
+              UserId: ApiClient.getCurrentUserId(),
+              Ids: c.TestItemId,
+              Fields: 'Path,MediaSources',
+              EnableTotalRecordCount: false,
+              Limit: 1
+            }).then(function (r) {
+              if (r && r.Items && r.Items[0]) showSelectedItem(r.Items[0]);
+              else showSelectedItem({ Id: c.TestItemId, Name: c.TestItemName || 'Previously selected item' });
+            }).catch(function () {
+              showSelectedItem({ Id: c.TestItemId, Name: c.TestItemName || 'Previously selected item' });
+            });
+          } else if (c.TestTitle) {
+            el('LibrarySearch').value = c.TestTitle;
+            el('SearchMessage').textContent = 'v0.1.1 test title detected. Search and select the exact item once to upgrade this setting.';
+          }
+          Dashboard.hideLoadingMsg();
+        });
+      });
+
+      el('SearchLibrary').addEventListener('click', runSearch);
+      el('LibrarySearch').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); runSearch(); }
+      });
+      el('UseSelectedItem').addEventListener('click', function () {
+        const index = parseInt(el('SearchResults').value || '0', 10);
+        if (searchItems[index]) {
+          showSelectedItem(searchItems[index]);
+          el('SearchMessage').textContent = 'Selected. Click Save below to store this exact Jellyfin item.';
+        }
+      });
+      el('RefreshTrackStatus').addEventListener('click', refreshStatus);
+
+      el('GuruAudioEnhancerConfigForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        Dashboard.showLoadingMsg();
+        ApiClient.getPluginConfiguration(pluginId).then(function (c) {
+          c.FfmpegPath = el('FfmpegPath').value;
+          c.TestMode = el('TestMode').checked;
+          c.TestItemId = el('TestItemId').value;
+          c.TestItemName = el('TestItemName').value;
+          if (c.TestItemId) c.TestTitle = '';
+          c.ProcessMovies = el('ProcessMovies').checked;
+          c.ProcessEpisodes = el('ProcessEpisodes').checked;
+          c.DialogueBoostEnabled = el('DialogueBoostEnabled').checked;
+          c.NightModeEnabled = el('NightModeEnabled').checked;
+          c.StrongDialogueEnabled = el('StrongDialogueEnabled').checked;
+          c.AacBitrateKbps = parseInt(el('AacBitrateKbps').value || '192', 10);
+          c.OverwriteExisting = el('OverwriteExisting').checked;
+          c.SkipNonLocalMedia = el('SkipNonLocalMedia').checked;
+          ApiClient.updatePluginConfiguration(pluginId, c).then(Dashboard.processPluginConfigurationUpdateResult);
+        });
+        return false;
+      });
+    })();
+  </script>
+</div>
