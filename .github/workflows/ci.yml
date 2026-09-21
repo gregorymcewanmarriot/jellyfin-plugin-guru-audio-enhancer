@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore Jellyfin.Plugin.GuruAudioEnhancer/Jellyfin.Plugin.GuruAudioEnhancer.csproj
+
+      - name: Build
+        run: dotnet build Jellyfin.Plugin.GuruAudioEnhancer/Jellyfin.Plugin.GuruAudioEnhancer.csproj --configuration Release --no-restore
