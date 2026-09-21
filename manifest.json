@@ -1,1 +1,21 @@
-[]
+[
+  {
+    "guid": "61a21ab4-b0c7-4e18-92d1-42f8495ed131",
+    "name": "Guru Audio Enhancer",
+    "description": "Creates optional dialogue-enhanced and night-mode external AAC tracks for movies and TV episodes without modifying the original media.",
+    "overview": "Optional dialogue-enhanced and night-mode audio tracks for Jellyfin",
+    "owner": "gregorymcewanmarriot",
+    "category": "General",
+    "imageUrl": "https://raw.githubusercontent.com/gregorymcewanmarriot/jellyfin-plugin-guru-audio-enhancer/main/docs/images/logo.png",
+    "versions": [
+      {
+        "version": "0.1.2.0",
+        "changelog": "- Added Jellyfin library search to Safe Test Mode.\n- Added exact Jellyfin Item ID selection to prevent fuzzy-title mismatches.\n- Added selected-title status showing source audio and discovered enhanced tracks.\n- Kept the proven Dialogue Boost and Night Mode filter profiles from v0.1.1 unchanged.\n- Retained backwards compatibility with the v0.1.1 text-based test title setting.\n- Confirmed generated tracks appear in Jellyfin Web and Jellyfin Media Player's in-player audio selector.",
+        "targetAbi": "12.0.0.0",
+        "sourceUrl": "https://github.com/gregorymcewanmarriot/jellyfin-plugin-guru-audio-enhancer/releases/download/v0.1.2.0/GuruAudioEnhancer-0.1.2.0-jf12.zip",
+        "checksum": "7d7bfa331bc81fa9b0d40d8ae0742bf9",
+        "timestamp": "2026-09-21T22:18:31Z"
+      }
+    ]
+  }
+]
