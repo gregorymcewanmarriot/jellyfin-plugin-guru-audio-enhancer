@@ -1,0 +1,44 @@
+name: Bug report
+description: Report a reproducible Guru Audio Enhancer problem
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: input
+    id: jellyfin
+    attributes:
+      label: Jellyfin Server version
+      placeholder: "12.x"
+    validations:
+      required: true
+  - type: input
+    id: plugin
+    attributes:
+      label: Guru Audio Enhancer version
+      placeholder: "0.1.2.0"
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Server platform
+      placeholder: "Ubuntu 24.04 / Docker / Windows ..."
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Source audio details
+      description: Codec, language and channel layout if known.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log excerpt
+      description: Include Guru Audio Enhancer / FFmpeg lines. Remove private paths if desired.
+      render: shell
