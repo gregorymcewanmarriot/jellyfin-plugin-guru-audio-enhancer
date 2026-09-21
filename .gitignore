@@ -1,0 +1,13 @@
+bin/
+obj/
+publish/
+dist/
+*.user
+*.suo
+*.cache
+*.pdb
+*.zip
+.DS_Store
+.vs/
+.idea/
+.vscode/
